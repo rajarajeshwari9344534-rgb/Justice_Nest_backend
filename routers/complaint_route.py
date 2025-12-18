@@ -69,7 +69,7 @@ def get_lawyer_complaints(lawyer_id: int,db: Session = Depends(get_db)):
 
 @complaint_router.put("/{complaint_id}")
 def update_complaint(
-    complaint_id: int,  data: ComplaintUpdate,db: Session = Depends(get_db)):
+complaint_id: int,  data: ComplaintUpdate,db: Session = Depends(get_db)):
     complaint = ( db.query(Complaints).filter(Complaints.id == complaint_id).first())
 
     if not complaint:
