@@ -47,11 +47,11 @@ def get_pending_complaints(db: Session = Depends(get_db)):
 
 @complaint_router.put("/{complaint_id}/accept")
 def accept_complaint(complaint_id: int,data: ComplaintAccept, db: Session = Depends(get_db)):
-    complaint = (db.query(Complaints).filter(Complaints.id == complaint_id) .first())
+    complaint = (db.query(Complaints).filter(Complaints.id == complaint_id,Complaints.status == "pending") .first())
 
     if not complaint:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Complaint not found")
-
+    
     complaint.lawyer_id = data.lawyer_id
     complaint.status = "accepted"
 

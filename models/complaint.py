@@ -19,3 +19,5 @@ class Complaints(Base):
     created_at = Column(DateTime, default=datetime.now, nullable=False)
 
 
+
+
