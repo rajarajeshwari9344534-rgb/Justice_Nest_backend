@@ -9,3 +9,4 @@ python-jose[cryptography]
 cloudinary
 watchfiles
 email-validator
+python-multipart
