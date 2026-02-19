@@ -6,14 +6,14 @@ from models.lawyers import Lawyers
 from pydantic import BaseModel, EmailStr
 
 class AdminLogin(BaseModel):
-    email: EmailStr
+    email: str
     password: str
 
 admin_router = APIRouter(prefix="/admin", tags=["Admin"])
 
 @admin_router.post("/login")
 def admin_login(credentials: AdminLogin):
-    if credentials.email == "admin@justicenest.com" and credentials.password == "admin123":
+    if credentials.email == "justiceraji" and credentials.password == "raji#JN08":
         access_token = create_access_token(data={"sub": credentials.email, "role": "admin"})
         return {
             "access_token": access_token,
