@@ -35,7 +35,7 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
         db.refresh(new_user)
 
         # Generate JWT Token for Auto-Login
-        access_token = create_access_token(data={"sub": new_user.email, "user_id": new_user.id})
+        access_token = create_access_token(data={"sub": new_user.email, "user_id": new_user.id, "role": "user"})
 
         return {
             "message": "User registered successfully",
@@ -73,7 +73,7 @@ def login(credentials: UserLogin, db: Session = Depends(get_db)):
         )
 
     # Generate JWT Token
-    access_token = create_access_token(data={"sub": user.email, "user_id": user.id})
+    access_token = create_access_token(data={"sub": user.email, "user_id": user.id, "role": "user"})
 
     return {
         "message": "Login successful",

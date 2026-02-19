@@ -15,16 +15,24 @@ def send_message(msg: MessageCreate, db: Session = Depends(get_db), current_user
     token_user_id = current_user.get("user_id") or current_user.get("id")
     token_role = current_user.get("role")
     
-    # Verify the user is authorized to send this message
+    # Infer role if not explicitly set
+    if not token_role:
+        token_role = "user"
+        
+    print(f"LOG: send_message attempt by {token_role} ID {token_user_id}. Target User: {msg.user_id}, Target Lawyer: {msg.lawyer_id}")
+    
+    # Verify authorization
     if token_role == "user" and int(token_user_id or 0) != int(msg.user_id):
+        print(f"FORBIDDEN: Token ID {token_user_id} != msg.user_id {msg.user_id}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to send messages for this user"
+            detail=f"Not authorized: Token ID {token_user_id} != msg.user_id {msg.user_id}"
         )
     elif token_role == "lawyer" and int(token_user_id or 0) != int(msg.lawyer_id):
+        print(f"FORBIDDEN: Token ID {token_user_id} != msg.lawyer_id {msg.lawyer_id}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to send messages for this lawyer"
+            detail=f"Not authorized: Token ID {token_user_id} != msg.lawyer_id {msg.lawyer_id}"
         )
     
     try:
@@ -48,13 +56,19 @@ def get_chat_history(user_id: int, lawyer_id: int, db: Session = Depends(get_db)
     token_user_id = current_user.get("user_id") or current_user.get("id")
     token_role = current_user.get("role")
     
+    # Infer role if not explicitly set
+    if not token_role:
+        token_role = "user"
+    
     # Verify authorization
-    if token_role == "user" and int(token_user_id or 0) != int(user_id):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to view this chat history"
-        )
-    elif token_role == "lawyer" and int(token_user_id or 0) != int(lawyer_id):
+    is_authorized = False
+    if token_role == "user" and int(token_user_id or 0) == int(user_id):
+        is_authorized = True
+    elif token_role == "lawyer" and int(token_user_id or 0) == int(lawyer_id):
+        is_authorized = True
+        
+    if not is_authorized:
+        print(f"FORBIDDEN Error in chat history: role={token_role}, token_id={token_user_id}, req_user_id={user_id}, req_lawyer_id={lawyer_id}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to view this chat history"
@@ -119,23 +133,23 @@ def delete_message(message_id: int, db: Session = Depends(get_db), current_user:
 @message_router.get("/conversations/{role}/{id}", response_model=List[ConversationResponse])
 def get_conversations(role: str, id: int, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     token_user_id = current_user.get("user_id") or current_user.get("id")
-    token_role = current_user.get("role")
-    
-    # Infer role if not explicitly set (users don't have role field, lawyers do)
+    # Infer role if not explicitly set
     if not token_role:
-        token_role = "user"  # If no role field, it's a user token
+        token_role = "user"
     
     # Verify authorization
-    if role == "user" and (token_role != "user" or int(token_user_id or 0) != int(id)):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to view these conversations"
-        )
-    elif role == "lawyer" and (token_role != "lawyer" or int(token_user_id or 0) != int(id)):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to view these conversations"
-        )
+    if role == "user":
+        if token_role != "user" or int(token_user_id or 0) != int(id):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Not authorized: {token_role} {token_user_id} cannot view user {id} conversations"
+            )
+    elif role == "lawyer":
+        if token_role != "lawyer" or int(token_user_id or 0) != int(id):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Not authorized: {token_role} {token_user_id} cannot view lawyer {id} conversations"
+            )
     
     if role == "user":
         # Get all lawyers this user has chatted with

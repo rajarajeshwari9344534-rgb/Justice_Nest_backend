@@ -9,19 +9,22 @@ class AdminLogin(BaseModel):
     email: str
     password: str
 
+
 admin_router = APIRouter(prefix="/admin", tags=["Admin"])
 
 @admin_router.post("/login")
 def admin_login(credentials: AdminLogin):
-    if credentials.email == "justiceraji" and credentials.password == "raji#JN08":
+    if credentials.email == "admin@justicenest.com" and credentials.password == "admin123":
         access_token = create_access_token(data={"sub": credentials.email, "role": "admin"})
         return {
             "access_token": access_token,
             "token_type": "bearer",
+            "user_id": 0,  # Static ID for admin
             "name": "Administrator",
             "email": credentials.email,
             "status": "approved"
         }
+
     raise HTTPException(status_code=401, detail="Invalid admin credentials")
 
 
