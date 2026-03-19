@@ -42,7 +42,8 @@ app.add_middleware(
     allow_origins=[
         "http://127.0.0.1:5500",
         "http://localhost:5500",
-        "https://justicenest.netlify.app"
+        "https://justicenest.netlify.app",
+        "https://www.justicenest.netlify.app"
     ],
     allow_credentials=True,
     allow_methods=["*"],
