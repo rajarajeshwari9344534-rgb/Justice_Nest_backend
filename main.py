@@ -27,10 +27,15 @@ from models.user import User
 from models.lawyers import Lawyers
 from models.complaint import Complaints
 from models.message import Messages
- 
-Base.metadata.create_all(bind=engine)
+
+if os.getenv("VERCEL") != "1":
+    Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+@app.get("/")
+def root():
+    return {"message": "Justice Nest backend is running"}
 
 app.add_middleware(
     CORSMiddleware,
