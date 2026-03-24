@@ -86,9 +86,9 @@ def get_stats(db: Session = Depends(get_db), current_user: dict = Depends(get_cu
         "approved_lawyers": approved_lawyers
     }
 
-# -----------------------------
+
 # REJECT LAWYER 
-# -----------------------------
+
 @admin_router.patch("/reject_lawyer/{lawyer_id}")
 def reject_lawyer(lawyer_id: int, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     if current_user.get("role") != "admin":

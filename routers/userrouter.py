@@ -4,19 +4,21 @@ from dependencies import get_db
 from schemas.user import UserCreate, UserUpdate, UserLogin
 from models.user import User
 from auth_utils import verify_password, get_password_hash, create_access_token, get_current_user
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 
 user_router = APIRouter(
     prefix="/users",
     tags=["Users"]
 )
 
-# -------------------------
+
 # SIGNUP
-# -------------------------
+
 @user_router.post("/signup", status_code=status.HTTP_201_CREATED)
 def signup(user: UserCreate, db: Session = Depends(get_db)):
     try:
-        # Check if user already exists
+        # Check if user already exists 
         existing_user = db.query(User).filter(User.email == user.email).first()
         if existing_user:
             raise HTTPException(status_code=400, detail="Email already registered")
@@ -52,9 +54,7 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
             raise e
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
-# -------------------------
 # LOGIN
-# -------------------------
 @user_router.post("/login")
 def login(credentials: UserLogin, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == credentials.email).first()
@@ -84,9 +84,10 @@ def login(credentials: UserLogin, db: Session = Depends(get_db)):
         "name": user.name
     }
 
-# -------------------------
+
 # GET SINGLE USER
-# -------------------------
+
+
 @user_router.get("/{user_id}")
 def get_user(user_id: int, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     token_user_id = current_user.get("user_id") or current_user.get("id")
@@ -106,9 +107,10 @@ def get_user(user_id: int, db: Session = Depends(get_db), current_user: dict = D
 
     return user
 
-# -------------------------
+
 # UPDATE USER
-# -------------------------
+
+
 @user_router.put("/{user_id}")
 def update_user(user_id: int, user_update: UserUpdate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     token_user_id = current_user.get("user_id") or current_user.get("id")
@@ -131,9 +133,10 @@ def update_user(user_id: int, user_update: UserUpdate, db: Session = Depends(get
 
     return {"message": "User updated successfully"}
 
-# -------------------------
+
 # DELETE USER
-# -------------------------
+
+
 @user_router.delete("/{user_id}")
 def delete_user(user_id: int, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     token_user_id = current_user.get("user_id") or current_user.get("id")

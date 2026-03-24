@@ -12,16 +12,16 @@ from auth_utils import verify_password, get_password_hash, create_access_token, 
 
 lawyerrouter = APIRouter(prefix="/lawyers", tags=["Lawyers"])
 
-# -----------------------------
+
 # TEST ROUTE
-# -----------------------------
+
 @lawyerrouter.get("/test")
 def lawyer_test():
     return {"status": "lawyer router working"}
 
-# -----------------------------
+
 # LOGIN LAWYER
-# -----------------------------
+
 @lawyerrouter.post("/login")
 def login_lawyer(credentials: LawyerLogin, db: Session = Depends(get_db)):
     lawyer = db.query(Lawyers).filter(Lawyers.email == credentials.email).first()
@@ -40,7 +40,7 @@ def login_lawyer(credentials: LawyerLogin, db: Session = Depends(get_db)):
         )
     
     # Generate Token
-    # Important: Distinguish role if needed in token, or just rely on separate endpoints
+
     access_token = create_access_token(data={"sub": lawyer.email, "role": "lawyer", "id": lawyer.id})
 
     return {
@@ -53,9 +53,9 @@ def login_lawyer(credentials: LawyerLogin, db: Session = Depends(get_db)):
         "status": lawyer.status
     }
 
-# -----------------------------
+
 # GET SINGLE LAWYER
-# -----------------------------
+
 @lawyerrouter.get("/{lawyer_id}")
 def get_lawyer(lawyer_id: int, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     token_user_id = current_user.get("id")
@@ -74,9 +74,9 @@ def get_lawyer(lawyer_id: int, db: Session = Depends(get_db), current_user: dict
         raise HTTPException(status_code=404, detail="Lawyer not found")
     return lawyer
 
-# -----------------------------
-# GET ALL APPROVED LAWYERS (Public)
-# -----------------------------
+
+# GET ALL APPROVED LAWYERS 
+
 @lawyerrouter.get("/")
 def get_all_lawyers(db: Session = Depends(get_db)):
     # Only return APPROVED lawyers
@@ -85,9 +85,9 @@ def get_all_lawyers(db: Session = Depends(get_db)):
         Lawyers.status == "approved"
     ).all()
 
-# -----------------------------
+
 # SIGNUP / ADD LAWYER
-# -----------------------------
+
 @lawyerrouter.post("/", status_code=status.HTTP_201_CREATED)
 def add_lawyer(
     name: str = Form(...),
@@ -158,9 +158,9 @@ def add_lawyer(
         "status": new_lawyer.status
     }
 
-# -----------------------------
+
 # UPDATE LAWYER
-# -----------------------------
+
 @lawyerrouter.put("/{lawyer_id}")
 def update_lawyer(
     lawyer_id: int,
@@ -224,9 +224,9 @@ def update_lawyer(
     db.commit()
     return {"message": "Profile updated successfully"}
 
-# -----------------------------
+
 # DELETE LAWYER (SOFT)
-# -----------------------------
+
 @lawyerrouter.delete("/{lawyer_id}")
 def delete_lawyer(lawyer_id: int, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     token_user_id = current_user.get("id")

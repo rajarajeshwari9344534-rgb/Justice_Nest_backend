@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+'''from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 from dependencies import get_db
@@ -34,7 +34,7 @@ def send_message(msg: MessageCreate, db: Session = Depends(get_db), current_user
             status_code=status.HTTP_403_FORBIDDEN,
             detail=f"Not authorized: Token ID {token_user_id} != msg.lawyer_id {msg.lawyer_id}"
         )
-    
+
     try:
         # Pydantic v2 uses model_dump, v1 uses dict
         data = msg.model_dump() if hasattr(msg, "model_dump") else msg.dict()
@@ -194,3 +194,4 @@ def get_conversations(role: str, id: int, db: Session = Depends(get_db), current
         return sorted(conversations, key=lambda x: x["timestamp"], reverse=True)
     
     return []
+'''
