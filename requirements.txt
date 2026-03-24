@@ -21,7 +21,6 @@ mypy==1.18.2
 mypy_extensions==1.1.0
 passlib==1.7.4
 pathspec==0.12.1
-psycopg2==2.9.11
 psycopg2-binary==2.9.11
 pyasn1==0.6.2
 pycparser==3.0
