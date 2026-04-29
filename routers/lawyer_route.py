@@ -29,14 +29,14 @@ def login_lawyer(credentials: LawyerLogin, db: Session = Depends(get_db)):
     if not lawyer:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password"
+            detail="Invalid email "
         )
     
     # Verify password (using auth_utils wrapper)
     if not verify_password(credentials.password, lawyer.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password"
+            detail="Invalid  password"
         )
     
     # Generate Token
